@@ -13,17 +13,17 @@ func TestUserRepository_Create(t *testing.T) {
 	defer teardown("users")
 
 	email := "user@example.org"
-	pass := "encrypted"
-	u, err := s.User().Create(&model.User{
-		Email:             email,
-		EncryptedPassword: pass,
-	})
+	pass := "password"
+	testUser := model.TestUser(t)
+	testUser.Email = email
+	testUser.Password = pass
+	u, err := s.User().Create(testUser)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
 	assert.NotEqual(t, 0, u.Id)
 	assert.Equal(t, email, u.Email)
-	assert.Equal(t, pass, u.EncryptedPassword)
+	assert.NotEmpty(t, u.EncryptedPassword)
 }
 
 func TestUserRepository_FindByEmail(t *testing.T) {
@@ -31,19 +31,20 @@ func TestUserRepository_FindByEmail(t *testing.T) {
 	defer teardown("users")
 
 	email := "user@example.org"
-	pass := "encrypted"
+	pass := "password"
 	_, err := s.User().FindByEmail(email)
 	assert.Error(t, err)
 
-	u, err := s.User().Create(&model.User{
-		Email:             email,
-		EncryptedPassword: pass,
-	})
+	testUser := model.TestUser(t)
+	testUser.Email = email
+	testUser.Password = pass
+
+	u, err := s.User().Create(testUser)
 
 	us, er := s.User().FindByEmail(u.Email)
 	assert.NoError(t, er)
 	assert.NotNil(t, us)
 	assert.NotEqual(t, 0, us.Id)
 	assert.Equal(t, email, us.Email)
-	assert.Equal(t, pass, us.EncryptedPassword)
+	assert.NotEmpty(t, us.EncryptedPassword)
 }
