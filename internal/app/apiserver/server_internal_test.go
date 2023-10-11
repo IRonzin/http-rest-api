@@ -9,11 +9,12 @@ import (
 
 	"github.com/IRonzin/http-rest-api/internal/app/model"
 	"github.com/IRonzin/http-rest-api/internal/app/store/teststore"
+	"github.com/gorilla/sessions"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestServer_HandleHealthCheck(t *testing.T) {
-	s := newServer(teststore.New())
+	s := newServer(teststore.New(), sessions.NewCookieStore([]byte("secret")))
 	rec := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodGet, "/health", nil)
 	s.ServeHTTP(rec, req)
@@ -57,7 +58,7 @@ func TestServer_HandleUsersCreate(t *testing.T) {
 			json.NewEncoder(&b).Encode(tc.payload)
 
 			req, _ := http.NewRequest(http.MethodPost, "/users", &b)
-			s := newServer(teststore.New())
+			s := newServer(teststore.New(), sessions.NewCookieStore([]byte("secret")))
 			s.ServeHTTP(rec, req)
 			assert.Equal(t, tc.expectedCode, rec.Code)
 
@@ -115,7 +116,7 @@ func TestServer_HandleSessionsCreate(t *testing.T) {
 			json.NewEncoder(&b).Encode(tc.payload)
 
 			req, _ := http.NewRequest(http.MethodPost, "/sessions", &b)
-			s := newServer(store)
+			s := newServer(store, sessions.NewCookieStore([]byte("secret")))
 			s.ServeHTTP(rec, req)
 			assert.Equal(t, tc.expectedCode, rec.Code)
 		})

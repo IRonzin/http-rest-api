@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/IRonzin/http-rest-api/internal/app/store/sqlstore"
+	"github.com/gorilla/sessions"
 )
 
 // Start ...
@@ -17,7 +18,8 @@ func Start(config *Config) error {
 	defer db.Close()
 
 	store := sqlstore.New(db)
-	s := newServer(store)
+	sessionStore := sessions.NewCookieStore([]byte(config.SessionKey))
+	s := newServer(store, sessionStore)
 	s.configureLogger(config)
 
 	s.logger.Info("starting api server")
