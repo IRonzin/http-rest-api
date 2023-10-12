@@ -56,3 +56,27 @@ func TestUserRepository_FindByEmail(t *testing.T) {
 	assert.Equal(t, email, us.Email)
 	assert.NotEmpty(t, us.EncryptedPassword)
 }
+
+func TestUserRepository_Find(t *testing.T) {
+	db, teardown := sqlstore.TestDB(t, databaseUrl)
+	defer teardown("users")
+	s := sqlstore.New(db)
+
+	email := "user@example.org"
+	pass := "password"
+	_, err := s.User().Find(0)
+	assert.EqualError(t, err, store.ErrRecordNotFound.Error())
+
+	testUser := model.TestUser(t)
+	testUser.Email = email
+	testUser.Password = pass
+
+	err = s.User().Create(testUser)
+
+	us, er := s.User().Find(testUser.Id)
+	assert.NoError(t, er)
+	assert.NotNil(t, us)
+	assert.NotEqual(t, 0, us.Id)
+	assert.Equal(t, email, us.Email)
+	assert.NotEmpty(t, us.EncryptedPassword)
+}
