@@ -76,3 +76,10 @@ func TestUser_Validate(t *testing.T) {
 	}
 
 }
+
+func BenchmarkValidate(b *testing.B) {
+	u := model.TestUserBenchmark(b)
+	for i := 0; i < b.N; i++ {
+		u.Validate()
+	}
+}

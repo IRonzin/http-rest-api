@@ -8,3 +8,10 @@ func TestUser(t *testing.T) *User {
 		Password: "password",
 	}
 }
+
+func TestUserBenchmark(b *testing.B) *User {
+	return &User{
+		Email:    "user@example.com",
+		Password: "password",
+	}
+}

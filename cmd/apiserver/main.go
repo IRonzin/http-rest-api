@@ -3,13 +3,15 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 
 	"github.com/BurntSushi/toml"
 	"github.com/IRonzin/http-rest-api/internal/app/apiserver"
 )
 
 var (
-	configPath string
+	configPath  string
+	isNeedPprof bool
 )
 
 func init() {
@@ -24,7 +26,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := apiserver.Start(config); err != nil {
+	if "true" == os.Getenv("IS_NEED_PPROF") {
+		isNeedPprof = true
+	}
+
+	if err := apiserver.Start(config, isNeedPprof); err != nil {
 		log.Fatal(err)
 	}
 
